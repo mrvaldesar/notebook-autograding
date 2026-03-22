@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../api';
+import { useI18n } from '../i18n';
 import { Container, Typography, TextField, Button, Box, Alert } from '@mui/material';
 
 const Register: React.FC = () => {
@@ -12,6 +13,7 @@ const Register: React.FC = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useI18n();
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -35,7 +37,7 @@ const Register: React.FC = () => {
       });
       navigate('/login');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Registration failed');
+      setError(err.response?.data?.detail || t('registrationFailed'));
     }
   };
 
@@ -43,7 +45,7 @@ const Register: React.FC = () => {
     <Container maxWidth="xs">
       <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Typography component="h1" variant="h5">
-          Student Registration
+          {t('studentRegistration')}
         </Typography>
         {error && <Alert severity="error" sx={{ width: '100%', mt: 2 }}>{error}</Alert>}
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
@@ -51,7 +53,7 @@ const Register: React.FC = () => {
             margin="normal"
             required
             fullWidth
-            label="Invitation Token"
+            label={t('invitationToken')}
             value={token}
             onChange={(e) => setToken(e.target.value)}
           />
@@ -59,7 +61,7 @@ const Register: React.FC = () => {
             margin="normal"
             required
             fullWidth
-            label="Email Address"
+            label={t('emailAddress')}
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -68,7 +70,7 @@ const Register: React.FC = () => {
             margin="normal"
             required
             fullWidth
-            label="Full Name"
+            label={t('fullName')}
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
           />
@@ -76,7 +78,7 @@ const Register: React.FC = () => {
             margin="normal"
             required
             fullWidth
-            label="Student ID (Carnet)"
+            label={t('studentId')}
             value={studentId}
             onChange={(e) => setStudentId(e.target.value)}
           />
@@ -84,7 +86,7 @@ const Register: React.FC = () => {
             margin="normal"
             required
             fullWidth
-            label="Password"
+            label={t('password')}
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -95,7 +97,7 @@ const Register: React.FC = () => {
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
-            Register
+            {t('registerBtn')}
           </Button>
         </Box>
       </Box>
