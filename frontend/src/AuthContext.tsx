@@ -19,19 +19,27 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      api.get('/users/me')
-        .then((res) => {
+    const checkToken = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const res = await api.get('/users/me');
           setUser(res.data);
-        })
-        .catch(() => {
+        } catch (error) {
           localStorage.removeItem('token');
           setUser(null);
-        });
-    }
+        } finally {
+          setIsInitializing(false);
+        }
+      } else {
+        setIsInitializing(false);
+      }
+    };
+
+    checkToken();
   }, []);
 
   const login = (token: string, userData: User) => {
@@ -43,6 +51,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('token');
     setUser(null);
   };
+
+  if (isInitializing) {
+    return null;
+  }
 
   return (
     <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>
