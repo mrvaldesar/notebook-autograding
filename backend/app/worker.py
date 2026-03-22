@@ -9,8 +9,26 @@ from app.db.session import SessionLocal
 from app import crud, models
 import nbformat
 import shutil
+import platform
 
-docker_client = docker.from_env()
+def get_docker_client():
+    """Initializes and returns a Docker client.
+    Handles fallbacks for Windows environments and verifies connection."""
+    try:
+        client = docker.from_env()
+        client.ping()
+        return client
+    except Exception as e:
+        # Fallback for Windows if from_env() fails
+        if platform.system() == "Windows":
+            try:
+                client = docker.DockerClient(base_url='npipe:////./pipe/docker_engine')
+                client.ping()
+                return client
+            except Exception as win_e:
+                raise Exception(f"Failed to connect to Docker daemon on Windows via npipe and env. Original error: {e}, Windows error: {win_e}")
+        else:
+            raise Exception(f"Failed to connect to Docker daemon: {e}")
 
 def calculate_score(rubric_criteria, notebook_content):
     # Simplified mock calculation based on rubric and notebook content
@@ -58,6 +76,18 @@ def autograde_notebook(notebook_version_id: int):
                 "status": models.submission.EvaluationStatus.FAILED,
                 "execution_logs": "No rubric found for this assignment."
             })
+            return
+
+        # Initialize Docker Client specifically for this task
+        try:
+            docker_client = get_docker_client()
+        except Exception as e:
+            error_msg = f"Docker Initialization Error: {e}"
+            crud.evaluation.update(db, db_obj=evaluation, obj_in={
+                "status": models.submission.EvaluationStatus.FAILED,
+                "execution_logs": error_msg
+            })
+            crud.audit_log.log_action(db=db, evaluation_id=evaluation.id, action=models.audit.AuditActionEnum.EVALUATION_FAILED, details="Failed to initialize Docker environment.")
             return
 
         # Prepare temporary directory
