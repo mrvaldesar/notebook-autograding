@@ -5,8 +5,10 @@ import Register from './components/Register';
 import ProfessorDashboard from './components/ProfessorDashboard';
 import StudentDashboard from './components/StudentDashboard';
 import { AuthProvider, useAuth } from './AuthContext';
+import { I18nProvider, useI18n } from './i18n';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { AppBar, Toolbar, Button, Box } from '@mui/material';
 
 const theme = createTheme({
   palette: {
@@ -58,15 +60,36 @@ const AppRoutes: React.FC = () => {
   );
 };
 
+const LanguageSwitcher: React.FC = () => {
+  const { language, setLanguage } = useI18n();
+  return (
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static" color="transparent" elevation={0}>
+        <Toolbar sx={{ justifyContent: 'flex-end' }}>
+          <Button
+            color="inherit"
+            onClick={() => setLanguage(language === 'en' ? 'es-GT' : 'en')}
+          >
+            {language === 'en' ? 'Español' : 'English'}
+          </Button>
+        </Toolbar>
+      </AppBar>
+    </Box>
+  );
+};
+
 const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AuthProvider>
-        <Router>
-          <AppRoutes />
-        </Router>
-      </AuthProvider>
+      <I18nProvider>
+        <AuthProvider>
+          <Router>
+            <LanguageSwitcher />
+            <AppRoutes />
+          </Router>
+        </AuthProvider>
+      </I18nProvider>
     </ThemeProvider>
   );
 };

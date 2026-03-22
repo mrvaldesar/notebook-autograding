@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Typography, Box, List, ListItem, ListItemText, Card, CardContent, Button, TextField, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import api from '../api';
+import { useI18n } from '../i18n';
 
 const ProfessorDashboard: React.FC = () => {
   const [courses, setCourses] = useState<any[]>([]);
@@ -20,6 +21,7 @@ const ProfessorDashboard: React.FC = () => {
   // Invite Student Modal
   const [openInviteModal, setOpenInviteModal] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
+  const { t } = useI18n();
 
   useEffect(() => {
     fetchCourses();
@@ -78,34 +80,34 @@ const ProfessorDashboard: React.FC = () => {
       await api.post('/users/invite', { email: inviteEmail });
       setOpenInviteModal(false);
       setInviteEmail('');
-      alert('Invitation sent successfully');
+      alert(t('inviteSuccess'));
     } catch (err) {
       console.error(err);
-      alert('Failed to send invitation');
+      alert(t('inviteFail'));
     }
   };
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Typography variant="h4" gutterBottom>Professor Dashboard</Typography>
+      <Typography variant="h4" gutterBottom>{t('professorDashboard')}</Typography>
 
       <Box sx={{ display: 'flex', gap: 4 }}>
         {/* Left column: Courses */}
         <Box sx={{ width: '30%' }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-            <Typography variant="h6">My Courses</Typography>
+            <Typography variant="h6">{t('myCourses')}</Typography>
             <Button variant="outlined" size="small" onClick={() => setOpenCourseModal(true)}>+</Button>
           </Box>
           <List>
             {courses.map(course => (
-              <ListItem button key={course.id} onClick={() => fetchAssignments(course.id)}>
+              <ListItem component="button" key={course.id} onClick={() => fetchAssignments(course.id)}>
                 <ListItemText primary={course.title} secondary={course.description} />
               </ListItem>
             ))}
           </List>
 
           <Button variant="contained" sx={{ mt: 2 }} fullWidth onClick={() => setOpenInviteModal(true)}>
-            Invite Student
+            {t('inviteStudent')}
           </Button>
         </Box>
 
@@ -114,8 +116,8 @@ const ProfessorDashboard: React.FC = () => {
           {selectedCourse ? (
             <>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6">Assignments</Typography>
-                <Button variant="contained" size="small" onClick={() => setOpenAssignmentModal(true)}>New Assignment</Button>
+                <Typography variant="h6">{t('assignments')}</Typography>
+                <Button variant="contained" size="small" onClick={() => setOpenAssignmentModal(true)}>{t('newAssignment')}</Button>
               </Box>
 
               {assignments.map(assignment => (
@@ -123,58 +125,58 @@ const ProfessorDashboard: React.FC = () => {
                   <CardContent>
                     <Typography variant="h6">{assignment.title}</Typography>
                     <Typography variant="body2">{assignment.description}</Typography>
-                    <Typography variant="caption" color="text.secondary">Docker Env: {assignment.docker_env}</Typography>
+                    <Typography variant="caption" color="text.secondary">{t('dockerEnv')} {assignment.docker_env}</Typography>
 
                     <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-                       <Button variant="outlined" size="small">Manage Rubric</Button>
-                       <Button variant="outlined" size="small">Upload Test Set</Button>
-                       <Button variant="outlined" size="small">View Submissions</Button>
+                       <Button variant="outlined" size="small">{t('manageRubric')}</Button>
+                       <Button variant="outlined" size="small">{t('uploadTestSet')}</Button>
+                       <Button variant="outlined" size="small">{t('viewSubmissions')}</Button>
                     </Box>
                   </CardContent>
                 </Card>
               ))}
             </>
           ) : (
-            <Typography variant="body1" color="text.secondary">Select a course to view assignments</Typography>
+            <Typography variant="body1" color="text.secondary">{t('selectCourse')}</Typography>
           )}
         </Box>
       </Box>
 
       {/* Course Modal */}
       <Dialog open={openCourseModal} onClose={() => setOpenCourseModal(false)}>
-        <DialogTitle>Create New Course</DialogTitle>
+        <DialogTitle>{t('createCourseTitle')}</DialogTitle>
         <DialogContent>
-          <TextField autoFocus margin="dense" label="Course Title" fullWidth value={newCourseTitle} onChange={(e) => setNewCourseTitle(e.target.value)} />
-          <TextField margin="dense" label="Description" fullWidth multiline rows={3} value={newCourseDesc} onChange={(e) => setNewCourseDesc(e.target.value)} />
+          <TextField autoFocus margin="dense" label={t('courseTitle')} fullWidth value={newCourseTitle} onChange={(e) => setNewCourseTitle(e.target.value)} />
+          <TextField margin="dense" label={t('description')} fullWidth multiline rows={3} value={newCourseDesc} onChange={(e) => setNewCourseDesc(e.target.value)} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenCourseModal(false)}>Cancel</Button>
-          <Button onClick={handleCreateCourse}>Create</Button>
+          <Button onClick={() => setOpenCourseModal(false)}>{t('cancel')}</Button>
+          <Button onClick={handleCreateCourse}>{t('create')}</Button>
         </DialogActions>
       </Dialog>
 
       {/* Assignment Modal */}
       <Dialog open={openAssignmentModal} onClose={() => setOpenAssignmentModal(false)}>
-        <DialogTitle>Create New Assignment</DialogTitle>
+        <DialogTitle>{t('createAssignmentTitle')}</DialogTitle>
         <DialogContent>
-          <TextField autoFocus margin="dense" label="Assignment Title" fullWidth value={newAssignmentTitle} onChange={(e) => setNewAssignmentTitle(e.target.value)} />
-          <TextField margin="dense" label="Description" fullWidth multiline rows={3} value={newAssignmentDesc} onChange={(e) => setNewAssignmentDesc(e.target.value)} />
+          <TextField autoFocus margin="dense" label={t('assignmentTitle')} fullWidth value={newAssignmentTitle} onChange={(e) => setNewAssignmentTitle(e.target.value)} />
+          <TextField margin="dense" label={t('description')} fullWidth multiline rows={3} value={newAssignmentDesc} onChange={(e) => setNewAssignmentDesc(e.target.value)} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenAssignmentModal(false)}>Cancel</Button>
-          <Button onClick={handleCreateAssignment}>Create</Button>
+          <Button onClick={() => setOpenAssignmentModal(false)}>{t('cancel')}</Button>
+          <Button onClick={handleCreateAssignment}>{t('create')}</Button>
         </DialogActions>
       </Dialog>
 
        {/* Invite Student Modal */}
        <Dialog open={openInviteModal} onClose={() => setOpenInviteModal(false)}>
-        <DialogTitle>Invite Student to Platform</DialogTitle>
+        <DialogTitle>{t('inviteStudentTitle')}</DialogTitle>
         <DialogContent>
-          <TextField autoFocus margin="dense" label="Student Email" type="email" fullWidth value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} />
+          <TextField autoFocus margin="dense" label={t('studentEmail')} type="email" fullWidth value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenInviteModal(false)}>Cancel</Button>
-          <Button onClick={handleInviteStudent} color="primary" variant="contained">Send Invite</Button>
+          <Button onClick={() => setOpenInviteModal(false)}>{t('cancel')}</Button>
+          <Button onClick={handleInviteStudent} color="primary" variant="contained">{t('sendInvite')}</Button>
         </DialogActions>
       </Dialog>
 

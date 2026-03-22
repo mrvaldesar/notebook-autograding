@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api';
 import { useAuth } from '../AuthContext';
+import { useI18n } from '../i18n';
 import { Container, Typography, TextField, Button, Box, Alert } from '@mui/material';
 
 const Login: React.FC = () => {
@@ -10,6 +11,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { t } = useI18n();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +38,7 @@ const Login: React.FC = () => {
         navigate('/student');
       }
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Login failed');
+      setError(err.response?.data?.detail || t('loginFailed'));
     }
   };
 
@@ -44,7 +46,7 @@ const Login: React.FC = () => {
     <Container maxWidth="xs">
       <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Typography component="h1" variant="h5">
-          Sign in
+          {t('signIn')}
         </Typography>
         {error && <Alert severity="error" sx={{ width: '100%', mt: 2 }}>{error}</Alert>}
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
@@ -53,7 +55,7 @@ const Login: React.FC = () => {
             required
             fullWidth
             id="email"
-            label="Email Address"
+            label={t('emailAddress')}
             name="email"
             autoComplete="email"
             autoFocus
@@ -65,7 +67,7 @@ const Login: React.FC = () => {
             required
             fullWidth
             name="password"
-            label="Password"
+            label={t('password')}
             type="password"
             id="password"
             autoComplete="current-password"
@@ -78,11 +80,11 @@ const Login: React.FC = () => {
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
           >
-            Sign In
+            {t('signInBtn')}
           </Button>
           <Box sx={{ display: 'flex', justifyContent: 'center' }}>
               <Link to="/register" style={{textDecoration: 'none', color: '#1976d2'}}>
-                Don't have an account? Register with token
+                {t('noAccount')}
               </Link>
           </Box>
         </Box>
