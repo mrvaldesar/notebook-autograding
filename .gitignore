@@ -3,9 +3,3 @@ __pycache__/
 node_modules/
 .env
 uploads/
-.env
-node_modules/
-__pycache__/
-*.pyc
-uploads/
-__pycache__/

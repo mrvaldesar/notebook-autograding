@@ -76,7 +76,11 @@ uvicorn main:app --reload --port 8000
 
 En otra terminal (dentro del entorno virtual en `backend/`), inicia el worker de Celery:
 ```bash
+# En Linux/macOS
 celery -A app.worker.celery_app worker --loglevel=info
+
+# En Windows (obligatorio usar --pool=solo para evitar errores de prefork / WinError 5)
+celery -A app.worker.celery_app worker --loglevel=info --pool=solo
 ```
 
 ### 4. Construir las imágenes Docker del Sandbox
