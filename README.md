@@ -76,7 +76,11 @@ uvicorn main:app --reload --port 8000
 
 En otra terminal (dentro del entorno virtual en `backend/`), inicia el worker de Celery:
 ```bash
+# En Linux/macOS
 celery -A app.worker.celery_app worker --loglevel=info
+
+# En Windows (obligatorio usar --pool=solo para evitar errores de prefork / WinError 5)
+celery -A app.worker.celery_app worker --loglevel=info --pool=solo
 ```
 
 ### 4. Construir las imágenes Docker del Sandbox
@@ -100,7 +104,11 @@ La aplicación estará disponible en `http://localhost:5173`.
 
 ## 👥 Flujo de Uso
 
-1.  **Profesor:** El administrador crea un usuario profesor directamente en la base de datos (o mediante un endpoint de superadmin).
+1.  **Creación del Primer Profesor (Admin):** Como no hay usuarios iniciales, ejecuta el script interactivo desde la terminal del backend para crear tu usuario profesor:
+    ```bash
+    python create_admin.py
+    ```
+    Te pedirá tu email, nombre y contraseña. Usa estas credenciales para iniciar sesión en el Frontend.
 2.  **Profesor -> Curso & Tarea:** Inicia sesión, crea un Curso y dentro crea una Tarea (Assignment) seleccionando el entorno Docker deseado.
 3.  **Profesor -> Invita Estudiantes:** Usa el botón de "Invitar Estudiante" con su correo. El sistema (SMTP) envía un token firmado.
 4.  **Estudiante -> Registro:** El estudiante abre el enlace del correo (`/register?token=...`), completa sus datos (Nombre, Carnet, Password) y crea su cuenta.

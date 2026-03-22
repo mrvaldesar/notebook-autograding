@@ -30,10 +30,9 @@ def send_email(
     logging.info(f"send email result: {response}")
 
 def send_invitation_email(email_to: str, token: str) -> None:
-    import os
     project_name = settings.PROJECT_NAME
     subject = f"{project_name} - Invitation to register"
-    base_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
+    base_url = settings.FRONTEND_URL.rstrip('/')
     link = f"{base_url}/register?token={token}"
     html = f"""
     <p>You have been invited to join the {project_name} platform.</p>
